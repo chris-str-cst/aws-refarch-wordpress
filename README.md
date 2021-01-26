@@ -1,5 +1,3 @@
-
-
 # **Hosting WordPress on AWS modified by K247work**
 
 ### Version 2.0.2-x
