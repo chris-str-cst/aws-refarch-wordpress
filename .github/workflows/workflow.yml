@@ -1,14 +1,15 @@
 name: s3-deploy-wp-refarch
-on:
-  pull_request:
-    branches:
-      - master
-    types: [opened, synchronize, closed] #他のjobがある想定でこの設定にしている
+on: [push]
+# on:
+#   pull_request:
+#     branches:
+#       - master
+#     types: [opened, synchronize, closed]
 
 jobs:
   SyncResources:
     name: Upload template files
-    if: github.event.pull_request.merged == true #マージされたときのみこのjobを実行する
+    #if: github.event.pull_request.merged == true 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -16,8 +17,10 @@ jobs:
       - name: "Configure AWS credentials"
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_S3 }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_S3 }}
-          aws-region: ap-northeast-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
       - name: S3 sync
-        run: aws s3 sync . s3://wp-training-resource-k247/refarch-wordpress-modified/ --delete --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers --exclude "images/*"
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: aws s3 sync . s3://$S3_BUCKET/refarch-wordpress/ --delete --exclude "images/*"
